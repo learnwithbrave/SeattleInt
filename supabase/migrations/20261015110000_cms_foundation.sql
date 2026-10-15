@@ -585,6 +585,9 @@ begin
   if target_role is null then
     raise exception using errcode = '22023', message = 'Role is required';
   end if;
+  if should_grant is null then
+    raise exception using errcode = '22023', message = 'Role grant action is required';
+  end if;
 
   select active into target_active
   from public.cms_profiles
@@ -649,6 +652,9 @@ begin
   if caller_id is null
      or not public.has_cms_role(array['administrator']::public.cms_role[]) then
     raise exception using errcode = '42501', message = 'Administrator role required';
+  end if;
+  if should_be_active is null then
+    raise exception using errcode = '22023', message = 'Account active state is required';
   end if;
   if caller_id = target_user_id and not should_be_active then
     raise exception using errcode = '55000', message = 'Administrators cannot deactivate their own account';
