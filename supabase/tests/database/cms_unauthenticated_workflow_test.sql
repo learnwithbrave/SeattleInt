@@ -22,7 +22,7 @@ select throws_ok(
 );
 
 select throws_ok(
-  'select public.submit_site_content_for_review(gen_random_uuid())',
+  'select public.submit_site_content_for_review(gen_random_uuid(), 1)',
   '42501',
   'Editor or administrator role required',
   'Unauthenticated review submission is rejected'
