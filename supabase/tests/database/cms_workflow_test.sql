@@ -1,6 +1,6 @@
 begin;
 
-select plan(28);
+select plan(30);
 
 -- These identities exist only inside this rolled-back test transaction.
 insert into auth.users (id, email) values
@@ -147,6 +147,28 @@ select throws_ok(
 );
 
 set local request.jwt.claim.sub = '33333333-3333-4333-8333-333333333333';
+
+
+select throws_ok(
+  $test$select public.admin_set_cms_role(
+    '11111111-1111-4111-8111-111111111111'::uuid,
+    'editor'::public.cms_role,
+    null
+  )$test$,
+  '22023',
+  'Role grant action is required',
+  'Null role-management action is rejected'
+);
+
+select throws_ok(
+  $test$select public.admin_set_cms_user_active(
+    '11111111-1111-4111-8111-111111111111'::uuid,
+    null
+  )$test$,
+  '22023',
+  'Account active state is required',
+  'Null account state is rejected'
+);
 
 select ok(
   public.has_cms_role(array['administrator']::public.cms_role[]),
