@@ -36,4 +36,4 @@ enabled = false
 
 [edge_runtime]
 enabled = true
-policy = "per_worker"
+policy = "oneshot"
