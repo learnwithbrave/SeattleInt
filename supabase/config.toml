@@ -22,14 +22,15 @@ sql_paths = ["./seed.sql"]
 enabled = true
 site_url = "http://127.0.0.1:5173"
 additional_redirect_urls = ["http://localhost:5173", "http://127.0.0.1:5173"]
-# CMS membership is invitation/operator-controlled; public sign-up remains disabled.
-enable_signup = false
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
 
 [auth.email]
 enable_signup = false
 enable_confirmations = false
+
+[auth.sms]
+enable_signup = false
 
 [analytics]
 enabled = false
