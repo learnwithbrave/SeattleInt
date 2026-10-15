@@ -1,6 +1,6 @@
 begin;
 
-select plan(23);
+select plan(24);
 
 -- These identities exist only inside this rolled-back test transaction.
 insert into auth.users (id, email) values
@@ -109,8 +109,21 @@ select throws_ok(
   'Stale draft write is rejected without overwriting the newer version'
 );
 
+select throws_ok(
+  $test$select public.submit_site_content_for_review(
+    current_setting('test.editor_draft_id', true)::uuid,
+    1
+  )$test$,
+  '40001',
+  'Draft version conflict; reload before submitting',
+  'Stale editor cannot submit a newer draft version by mistake'
+);
+
 select is(
-  public.submit_site_content_for_review(current_setting('test.editor_draft_id', true)::uuid),
+  public.submit_site_content_for_review(
+    current_setting('test.editor_draft_id', true)::uuid,
+    2
+  ),
   3,
   'Editor can submit the current version for review'
 );
@@ -146,7 +159,7 @@ select ok(
 );
 
 select is(
-  public.submit_site_content_for_review(current_setting('test.admin_draft_id', true)::uuid),
+  public.submit_site_content_for_review(current_setting('test.admin_draft_id', true)::uuid, 1),
   2,
   'Administrator draft can enter the same review workflow'
 );
