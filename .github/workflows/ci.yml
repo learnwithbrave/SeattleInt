@@ -1,6 +1,7 @@
 name: SeattleInt CI
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:
@@ -54,7 +55,7 @@ jobs:
         run: supabase start
 
       - name: Recreate local database from committed migrations and seed
-        run: supabase db reset
+        run: supabase db reset --local --yes
 
       - name: Lint local database schema
         run: supabase db lint --local
