@@ -147,7 +147,9 @@ Do not run db push until the migration is reviewed and verified against local Po
 - Never place live credentials in supabase/seed.sql, GitHub Actions logs, screenshots, or issue comments.
 - Use separate credentials/projects for local, staging, and production; rotate credentials if exposed.
 
-The project’s current frontend is not wired to the placeholder values in .env.example. Do not add live keys until Phase 2 creates the client service and the owner chooses environments.
+The browser client scaffold is in src/lib/supabase/client.ts and the published-content RPC wrapper is in src/content/supabaseContentService.ts. They are deliberately not imported by App.tsx or SiteContentProvider.tsx yet, so the public site continues to use its existing content path until the migration is applied and an approved publication exists in staging.
+
+For local development, copy .env.example to .env.local, put the project URL and publishable key provided by the project owner into that ignored file, then restart Vite. Never commit .env.local. The client helper throws a clear configuration error if a future consumer imports it without both values. Do not connect the live provider until the content schema and staging publication have been validated.
 
 ## 8. Rollback and incident response
 
