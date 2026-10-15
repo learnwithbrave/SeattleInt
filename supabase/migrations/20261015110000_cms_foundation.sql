@@ -202,16 +202,31 @@ create trigger on_auth_user_created_cms_profile
 -- Profile / role reads are limited to the active user's own rows and administrators.
 create policy cms_profiles_read_self_or_admin
   on public.cms_profiles for select to authenticated
-  using (user_id = (select auth.uid()) or public.has_cms_role(array['administrator']::public.cms_role[]));
+  using (
+    (
+      user_id = (select auth.uid())
+      and public.has_cms_role(array['editor', 'publisher', 'administrator']::public.cms_role[])
+    )
+    or public.has_cms_role(array['administrator']::public.cms_role[])
+  );
 
 create policy cms_user_roles_read_self_or_admin
   on public.cms_user_roles for select to authenticated
-  using (user_id = (select auth.uid()) or public.has_cms_role(array['administrator']::public.cms_role[]));
+  using (
+    (
+      user_id = (select auth.uid())
+      and public.has_cms_role(array['editor', 'publisher', 'administrator']::public.cms_role[])
+    )
+    or public.has_cms_role(array['administrator']::public.cms_role[])
+  );
 
 create policy revisions_read_owned_or_reviewer
   on public.site_content_revisions for select to authenticated
   using (
-    created_by = (select auth.uid())
+    (
+      created_by = (select auth.uid())
+      and public.has_cms_role(array['editor', 'administrator']::public.cms_role[])
+    )
     or public.has_cms_role(array['publisher', 'administrator']::public.cms_role[])
   );
 
