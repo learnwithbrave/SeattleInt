@@ -1,6 +1,6 @@
 begin;
 
-select plan(35);
+select plan(39);
 
 select has_table('public', 'cms_profiles', 'CMS profiles table exists');
 select has_table('public', 'cms_user_roles', 'CMS role assignments table exists');
