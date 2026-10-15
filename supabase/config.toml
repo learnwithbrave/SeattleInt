@@ -1,0 +1,41 @@
+# Supabase local development configuration for SeattleInt.
+# This file contains no credentials and does not connect to a hosted project.
+project_id = "seattleint"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+# Let the installed Supabase CLI select its supported default PostgreSQL version.
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:5173"
+additional_redirect_urls = ["http://localhost:5173", "http://127.0.0.1:5173"]
+enable_signup = false
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+
+[auth.email]
+enable_signup = false
+enable_confirmations = false
+
+[auth.sms]
+enable_signup = false
+
+[analytics]
+enabled = false
+
+[edge_runtime]
+enabled = true
+policy = "oneshot"

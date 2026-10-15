@@ -1,0 +1,9 @@
+-- Enable pgTAP in the disposable local database so `supabase test db` can run.
+-- This seed file is used for local development/CI, not to create production records.
+create extension if not exists pgtap with schema extensions;
+
+-- Phase 1 intentionally has no auth users, role assignments, or public site snapshot.
+-- Do not seed real church submissions, contact details, credentials, or production data.
+-- Phase 2 will add a reviewed, deterministic local-only content fixture.
+-- First-admin bootstrap and the initial published content import are documented in
+-- docs/architecture/OPERATIONS.md; never copy a real user UUID into this file.
