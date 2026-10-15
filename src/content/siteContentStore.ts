@@ -47,7 +47,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 }
 
-function isSiteContent(value: unknown): value is SiteContent {
+export function isSiteContent(value: unknown): value is SiteContent {
   if (!isRecord(value)) {
     return false
   }
