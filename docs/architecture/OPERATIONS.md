@@ -25,17 +25,11 @@ From the repository root:
 3. Apply migrations and reset the local database only:
 
    ~~~sh
-   supabase db reset
+   supabase db reset --local --yes
    ~~~
 
    This is expected to destroy and recreate the local database from the committed migrations and seed. Check the active target before every destructive command.
-4. Ensure pgTAP is enabled in the **local** database. In the local Supabase Studio SQL editor, run:
-
-   ~~~sql
-   create extension if not exists pgtap with schema extensions;
-   ~~~
-
-   Confirm the extension is available to the test runner; do not expose the extensions schema through the public Data API.
+4. The committed local seed enables pgTAP in the `extensions` schema. The `supabase db reset --local --yes` step above runs the migration and seed. Confirm pgTAP is available to the test runner; do not expose the extensions schema through the public Data API. If running the test suite outside this local reset workflow, enable pgTAP explicitly in that disposable test database.
 5. Run database tests:
 
    ~~~sh
