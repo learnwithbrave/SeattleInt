@@ -684,7 +684,7 @@ language plpgsql
 stable
 security definer
 set search_path = ''
-as $
+as $$
 declare
   caller_id uuid := auth.uid();
   publication_row public.site_publication%rowtype;
@@ -708,7 +708,7 @@ begin
     'published_at', publication_row.published_at
   );
 end;
-$;
+$$;
 revoke all on function public.read_site_publication_state() from public, anon;
 grant execute on function public.read_site_publication_state() to authenticated;
 
