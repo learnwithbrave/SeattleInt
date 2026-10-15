@@ -270,8 +270,8 @@ declare
   new_revision_id uuid;
 begin
   if caller_id is null
-     or not public.has_cms_role(array['editor', 'publisher', 'administrator']::public.cms_role[]) then
-    raise exception using errcode = '42501', message = 'CMS role required';
+     or not public.has_cms_role(array['editor', 'administrator']::public.cms_role[]) then
+    raise exception using errcode = '42501', message = 'Editor or administrator role required';
   end if;
 
   select publication.revision_id, revision.payload
@@ -558,6 +558,8 @@ declare
   affected_count integer;
   active_admin_count integer;
 begin
+  -- Serialize administrator membership changes so concurrent requests cannot remove the last admin.
+  perform pg_catalog.pg_advisory_xact_lock(1420493334);
   if caller_id is null
      or not public.has_cms_role(array['administrator']::public.cms_role[]) then
     raise exception using errcode = '42501', message = 'Administrator role required';
@@ -624,6 +626,8 @@ declare
   target_is_admin boolean;
   active_admin_count integer;
 begin
+  -- Use the same lock as role membership changes to serialize last-admin safety checks.
+  perform pg_catalog.pg_advisory_xact_lock(1420493334);
   if caller_id is null
      or not public.has_cms_role(array['administrator']::public.cms_role[]) then
     raise exception using errcode = '42501', message = 'Administrator role required';
@@ -672,6 +676,42 @@ end;
 $$;
 
 -- These security-definer operations are not callable by anonymous clients.
+
+
+create or replace function public.read_site_publication_state()
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $
+declare
+  caller_id uuid := auth.uid();
+  publication_row public.site_publication%rowtype;
+begin
+  if caller_id is null
+     or not public.has_cms_role(array['publisher', 'administrator']::public.cms_role[]) then
+    raise exception using errcode = '42501', message = 'Publisher or administrator role required';
+  end if;
+
+  select * into publication_row
+  from public.site_publication
+  where singleton_id = 1;
+
+  if not found then
+    return null;
+  end if;
+
+  return jsonb_build_object(
+    'revision_id', publication_row.revision_id,
+    'published_by', publication_row.published_by,
+    'published_at', publication_row.published_at
+  );
+end;
+$;
+revoke all on function public.read_site_publication_state() from public, anon;
+grant execute on function public.read_site_publication_state() to authenticated;
+
 revoke all on function public.create_site_content_draft() from public, anon;
 revoke all on function public.save_site_content_draft(uuid, jsonb, integer, text) from public, anon;
 revoke all on function public.submit_site_content_for_review(uuid) from public, anon;
