@@ -1,6 +1,6 @@
 begin;
 
-select plan(26);
+select plan(28);
 
 -- These identities exist only inside this rolled-back test transaction.
 insert into auth.users (id, email) values
@@ -283,6 +283,29 @@ select throws_ok(
   '42501',
   'Administrator role required',
   'Publisher cannot grant roles'
+);
+
+set local request.jwt.claim.sub = '33333333-3333-4333-8333-333333333333';
+
+select public.admin_set_cms_user_active(
+  '11111111-1111-4111-8111-111111111111'::uuid,
+  false
+);
+
+set local request.jwt.claim.sub = '11111111-1111-4111-8111-111111111111';
+
+select is(
+  (select count(*)::integer from public.site_content_revisions
+   where id = current_setting('test.editor_draft_id', true)::uuid),
+  0,
+  'Deactivated editor loses direct access to their own revisions'
+);
+
+select throws_ok(
+  'select public.create_site_content_draft()',
+  '42501',
+  'Editor or administrator role required',
+  'Deactivated editor cannot start a new CMS operation'
 );
 
 set local role anon;
