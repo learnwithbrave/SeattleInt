@@ -340,7 +340,7 @@ begin
     raise exception using errcode = '55000', message = 'Only editable drafts can be saved';
   end if;
 
-  if revision_row.version <> expected_version then
+  if revision_row.version is distinct from expected_version then
     raise exception using errcode = '40001', message = 'Draft version conflict; reload before saving';
   end if;
 
@@ -359,7 +359,7 @@ begin
 end;
 $$;
 
-create or replace function public.submit_site_content_for_review(revision_id uuid)
+create or replace function public.submit_site_content_for_review(revision_id uuid, expected_version integer)
 returns integer
 language plpgsql
 security definer
@@ -385,6 +385,9 @@ begin
   end if;
   if revision_row.status not in ('draft', 'changes_requested') then
     raise exception using errcode = '55000', message = 'Draft is not ready for submission';
+  end if;
+  if revision_row.version is distinct from expected_version then
+    raise exception using errcode = '40001', message = 'Draft version conflict; reload before submitting';
   end if;
   if not public.is_valid_site_content_payload(revision_row.payload) then
     raise exception using errcode = '22023', message = 'Site content payload is invalid';
@@ -714,7 +717,7 @@ grant execute on function public.read_site_publication_state() to authenticated;
 
 revoke all on function public.create_site_content_draft() from public, anon;
 revoke all on function public.save_site_content_draft(uuid, jsonb, integer, text) from public, anon;
-revoke all on function public.submit_site_content_for_review(uuid) from public, anon;
+revoke all on function public.submit_site_content_for_review(uuid, integer) from public, anon;
 revoke all on function public.request_site_content_changes(uuid, text) from public, anon;
 revoke all on function public.publish_site_content_revision(uuid, uuid, text) from public, anon;
 revoke all on function public.admin_set_cms_role(uuid, public.cms_role, boolean) from public, anon;
@@ -722,7 +725,7 @@ revoke all on function public.admin_set_cms_user_active(uuid, boolean) from publ
 
 grant execute on function public.create_site_content_draft() to authenticated;
 grant execute on function public.save_site_content_draft(uuid, jsonb, integer, text) to authenticated;
-grant execute on function public.submit_site_content_for_review(uuid) to authenticated;
+grant execute on function public.submit_site_content_for_review(uuid, integer) to authenticated;
 grant execute on function public.request_site_content_changes(uuid, text) to authenticated;
 grant execute on function public.publish_site_content_revision(uuid, uuid, text) to authenticated;
 grant execute on function public.admin_set_cms_role(uuid, public.cms_role, boolean) to authenticated;
