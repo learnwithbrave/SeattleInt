@@ -1,13 +1,13 @@
-import { motion } from 'framer-motion'
+import { motion, type Variants } from 'framer-motion'
 import { useSiteContent } from '../content/siteContentStore'
 import { useDocumentMeta } from '../hooks/useDocumentMeta'
 
-const fadeInUp = {
+const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
 }
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.1 } }
 }
@@ -37,13 +37,13 @@ export function AboutPage() {
             variants={staggerContainer}
             className="max-w-3xl"
           >
-            <motion.p variants={fadeInUp as any} className="text-primary-500 font-bold uppercase tracking-[0.2em] text-xs mb-4">
+            <motion.p variants={fadeInUp} className="text-primary-500 font-bold uppercase tracking-[0.2em] text-xs mb-4">
               About us
             </motion.p>
-            <motion.h1 variants={fadeInUp as any} className="font-display text-5xl md:text-7xl font-bold leading-[1.1] mb-6">
+            <motion.h1 variants={fadeInUp} className="font-display text-5xl md:text-7xl font-bold leading-[1.1] mb-6">
                Who we are and what shapes our church family
             </motion.h1>
-            <motion.p variants={fadeInUp as any} className="text-xl text-stone-300 font-medium max-w-2xl leading-relaxed">
+            <motion.p variants={fadeInUp} className="text-xl text-stone-300 font-medium max-w-2xl leading-relaxed">
               We want this church to feel spiritually grounded, practically welcoming,
               and transparent about what we believe.
             </motion.p>
