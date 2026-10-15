@@ -1,6 +1,6 @@
 begin;
 
-select plan(24);
+select plan(26);
 
 -- These identities exist only inside this rolled-back test transaction.
 insert into auth.users (id, email) values
@@ -151,6 +151,27 @@ set local request.jwt.claim.sub = '33333333-3333-4333-8333-333333333333';
 select ok(
   public.has_cms_role(array['administrator']::public.cms_role[]),
   'Administrator role is resolved from trusted database role assignments'
+);
+
+select throws_ok(
+  $test$select public.admin_set_cms_role(
+    '33333333-3333-4333-8333-333333333333'::uuid,
+    'administrator'::public.cms_role,
+    false
+  )$test$,
+  '55000',
+  'Cannot remove the last active administrator',
+  'The last active administrator cannot remove their own admin role'
+);
+
+select throws_ok(
+  $test$select public.admin_set_cms_user_active(
+    '33333333-3333-4333-8333-333333333333'::uuid,
+    false
+  )$test$,
+  '55000',
+  'Administrators cannot deactivate their own account',
+  'An administrator cannot deactivate their own account'
 );
 
 select ok(
