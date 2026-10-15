@@ -70,3 +70,16 @@ npm run lint
 - Verify hosted form endpoints submit successfully after email verification.
 - Test `/admin` editing, export, import, and default reset flows in the target browser.
 - Re-test mobile navigation, maps, and all external CTAs before launch.
+
+
+## Supabase client setup
+
+The project includes a shared browser client at \`src/lib/supabase/client.ts\` and a CMS content query helper at \`src/content/supabaseContentService.ts\`. Install dependencies with:
+
+~~~sh
+npm install
+~~~
+
+For local Vite development, copy \`.env.example\` to \`.env.local\` and put the project's Supabase URL and publishable key into that ignored file. The publishable key is intended for browser use; never use a Supabase secret/service-role key in a \`VITE_*\` variable. Restart the Vite dev server after editing environment variables.
+
+The CMS helper calls the \`read_published_site_content\` RPC created by the versioned Supabase migration. It is not yet wired into the current public content provider: the site continues to use its existing content flow until the migration is applied to a reviewed staging project and an approved initial publication is loaded. Do not replace this church site's route-based \`App.tsx\` with the generic \`todos\` demo; no \`todos\` table is defined by this project.
