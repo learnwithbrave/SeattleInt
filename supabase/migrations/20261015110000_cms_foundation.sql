@@ -44,7 +44,7 @@ create table public.site_content_revisions (
   id uuid primary key default gen_random_uuid(),
   revision_number bigint generated always as identity unique,
   payload jsonb not null
-    check (jsonb_typeof(payload) = 'object' and pg_column_size(payload) <= 2097152),
+    check (jsonb_typeof(payload) = 'object' and octet_length(payload::text) <= 2097152),
   status public.content_revision_status not null default 'draft',
   created_by uuid not null references auth.users(id),
   created_at timestamptz not null default now(),
@@ -77,7 +77,7 @@ create table public.cms_audit_logs (
   action text not null check (char_length(action) between 1 and 100),
   target_revision_id uuid references public.site_content_revisions(id) on delete set null,
   metadata jsonb not null default '{}'::jsonb
-    check (jsonb_typeof(metadata) = 'object' and pg_column_size(metadata) <= 16384),
+    check (jsonb_typeof(metadata) = 'object' and octet_length(metadata::text) <= 16384),
   created_at timestamptz not null default now()
 );
 create index cms_audit_logs_created_at_idx
@@ -172,7 +172,7 @@ as $$
     and jsonb_typeof(candidate #> '{forms,contact}') = 'object'
     and jsonb_typeof(candidate #> '{forms,prayer}') = 'object'
     and jsonb_typeof(candidate #> '{forms,ministryJoin}') = 'object'
-    and pg_column_size(candidate) <= 2097152,
+    and octet_length(candidate::text) <= 2097152,
     false
   );
 $$;
